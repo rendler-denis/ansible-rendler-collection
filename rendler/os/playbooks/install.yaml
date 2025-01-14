@@ -1,0 +1,32 @@
+---
+
+- name: Run the install sequence for roles
+  hosts: all
+  become: true
+
+  tasks:
+    - name: Load the roles to run
+      ansible.builtin.set_fact:
+        roles_list: '{{ lookup("env", "ROLES").split(",") }}'
+      tags: always
+
+    - name: List roles to be executed
+      ansible.builtin.debug:
+        var: roles_list
+      tags: always
+      run_once: true
+
+    - name: Running role(s)
+      # no_log: true
+      tags: always
+      ansible.builtin.include_role:
+        name: '{{ role }}'
+        apply:
+          tags:
+            - install
+            - update
+            - configure
+            - restart
+      loop: "{{ roles_list }}"
+      loop_control:
+        loop_var: role

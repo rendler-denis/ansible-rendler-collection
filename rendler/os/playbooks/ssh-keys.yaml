@@ -1,0 +1,8 @@
+---
+
+- name: Deploy user SSH keys
+  hosts: all
+  become: true
+
+  roles:
+    - ssh-keys

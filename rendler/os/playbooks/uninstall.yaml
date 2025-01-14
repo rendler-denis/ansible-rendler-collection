@@ -1,0 +1,23 @@
+---
+
+- name: Run the uninstall/remove sequence for roles
+  hosts: all
+
+  tasks:
+    - name: Load the roles to run
+      run_once: true
+      ansible.builtin.set_fact:
+        roles_list: '{{ lookup("env", "ROLES").split(",") }}'
+
+    - name: List roles to be executed
+      ansible.builtin.debug:
+        var: roles_list
+
+    - name: Running role(s)
+      tags: always
+      ansible.builtin.include_role:
+        name: '{{ role }}'
+        tasks_from: ../remove/main.yaml
+      loop: "{{ roles_list }}"
+      loop_control:
+        loop_var: role
