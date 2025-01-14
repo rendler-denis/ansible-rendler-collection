@@ -1,0 +1,10 @@
+---
+baseline_os_apps:
+  - { name: vim, state: present }
+  - { name: git, state: present }
+  - { name: htop, state: present }
+  - { name: iftop, state: present }
+  - { name: glances, state: present }
+  - { name: multitail, state: present }
+  - { name: tar, state: present }
+  - { name: net-tools, state: present }

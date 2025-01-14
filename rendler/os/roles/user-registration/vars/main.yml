@@ -1,0 +1,19 @@
+---
+user_defaults:
+  uid: -1
+  group: ''
+  expires: -1
+  update_password: always
+  non_unique: false
+  system: false
+  comment: ""
+  groups: []
+  shell: /bin/bash
+  state: present
+  createhome: true
+  home: ""
+  ssh_key: ""
+  sudo: false
+  sudo_nopasswd: false
+  sudo_commands: ALL
+  ssh_key_path: ""

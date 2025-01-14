@@ -1,0 +1,13 @@
+---
+
+- name: Configure openssh server
+  ansible.builtin.template:
+    src: templates/settings.conf.j2
+    dest: "/etc/ssh/sshd_config.d/{{ openssh_config.config_filename }}"
+    owner: root
+    group: root
+    mode: '0600'
+  notify: restart sshd
+  when: openssh_config.settings is defined
+  vars:
+    config: "{{ openssh_config.settings }}"

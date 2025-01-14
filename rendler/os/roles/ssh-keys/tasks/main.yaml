@@ -1,0 +1,11 @@
+---
+
+- name: Deploy SSH key
+  ansible.posix.authorized_key:
+    user: "{{ item.user }}"
+    key: "{{ item.sshkeys }}"
+    manage_dir: true
+    state: present
+    comment: "{{ item.comment | default('') }}"
+    exclusive: "{{ item.exclusive | default(false) }}"
+  with_items: "{{ ssh_keys.deploy }}"

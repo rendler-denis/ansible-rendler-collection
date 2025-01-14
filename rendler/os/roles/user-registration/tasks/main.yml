@@ -1,0 +1,11 @@
+---
+- name: Load default config values
+  ansible.builtin.set_fact:
+    users_registration_user_defaults: "{{ lookup('file', 'vars/main.yml') | from_yaml }}"
+  tags: ['always']
+
+- name: Register users
+  ansible.builtin.include_tasks: "{{ ansible_os_family }}.yml"
+  tags: ['always']
+  with_items: "{{ user_registration_users_list }}"
+  no_log: true

@@ -1,0 +1,7 @@
+---
+swap_config:
+  path: '/swap'
+  size: 4000
+  count: 1
+  swappiness: 0.2
+  vfs_cache_pressure: 0

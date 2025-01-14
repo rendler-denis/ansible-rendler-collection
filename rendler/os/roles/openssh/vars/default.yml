@@ -1,0 +1,6 @@
+---
+
+openssh_config:
+  config_filename: "99-settings.conf"
+  restart_service: true
+  settings: []

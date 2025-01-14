@@ -1,0 +1,26 @@
+---
+
+- name: Ensure locales package installed
+  ansible.builtin.apt:
+    name: "{{ locale.pkg }}"
+    state: present
+  when: locale.install_pkg
+
+- name: Ensure locale is configured
+  community.general.locale_gen:
+    name: "{{ locale.lc_all }}"
+    state: present
+
+- name: Ensure locale is set
+  ansible.builtin.template:
+    src: "template/default.conf"
+    dest: /etc/default/locale
+    mode: "0644"
+    backup: true
+
+- name: Ensure locale env is set
+  ansible.builtin.lineinfile:
+    dest: "/etc/environment"
+    line: "LC_ALL={{ locale.lc_all }}"
+    insertbefore: BOF
+    regexp: "(LC_ALL)+"

@@ -1,0 +1,71 @@
+---
+- name: Merge with defaults
+  ansible.builtin.set_fact:
+    user: "{{ users_registration_user_defaults['user_defaults'] | ansible.builtin.combine(item, recursive=true) }}"
+
+- name: Configure home directory
+  ansible.builtin.set_fact:
+    user_home: "{{ '/home/' + user.name }}"
+  when: user.home == ''
+
+- name: Create group
+  ansible.builtin.group:
+    name: "{{ user.group | default(user.name, true) }}"
+    gid: "{{ user.gid | default(user.uid, true) }}"
+    state: "{{ user.state if user.name == user.group else 'present' }}"
+  when: user.group != ''
+
+- name: Create user {{ user.name }}
+  ansible.builtin.user:
+    name: "{{ user.name }}"
+    password: "{{ user.password | ansible.builtin.password_hash('sha512') }}"
+
+    # optional - if not preset we use defaults
+    expires: "{{ user.expires }}"
+    update_password: "{{ user.update_password }}"
+    non_unique: "{{ user.non_unique }}"
+    system: "{{ user.system }}"
+    comment: "{{ user.comment }}"
+    uid: "{{ user.uid }}"
+    group: "{{ user.group | default(user.name, true) }}"
+    groups: "{{ user.groups }}"
+    shell: "{{ user.shell }}"
+    state: "{{ user.state }}"
+    createhome: "{{ user.createhome }}"
+    home: "{{ user.home | default(user_home, true) }}"
+
+- name: Allow sudo for user {{ user.name }}
+  community.general.sudoers:
+    name: "{{ user.name }}"
+    state: "{{ 'present' if user.sudo else 'absent' }}"
+    user: "{{ user.name }}"
+    commands: "{{ user.sudo_commands }}"
+  when: user.state == 'present'
+
+- name: Register SSH key for user {{ user.name }}
+  when: user.state == 'present'
+  block:
+    - name: Add SSH key
+      ansible.posix.authorized_key:
+        user: "{{ user.name }}"
+        key: "{{ user.ssh_key }}"
+        path: "{{ user.ssh_key_path | default(user_home + '/.ssh/authorized_keys', true) }}"
+        manage_dir: true
+        state: present
+        exclusive: true
+      when: user.ssh_key | default(false)
+
+    - name: Config SSH for user {{ user.name }}
+      ansible.builtin.blockinfile:
+        path: "/etc/ssh/sshd_config.d/99-ansible_user_{{ user.name }}.conf"
+        block: |
+          Match User {{ user.name }}
+            AuthorizedKeysFile /etc/ssh/authorized_keys/{{ user.name }}
+        create: true
+        state: "{{ 'present' if user.ssh_key_path else 'absent' }}"
+        mode: "0600"
+      when: not user.createhome and ( user.ssh_key and user.ssh_key_path )
+      notify: Restart sshd service
+
+    - name: Flush handlers
+      ansible.builtin.meta: flush_handlers

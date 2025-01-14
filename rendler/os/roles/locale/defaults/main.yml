@@ -1,0 +1,6 @@
+---
+
+locale_config:
+  install_pkg: false
+  pkg: locales
+  lc_all: en_US.UTF-8

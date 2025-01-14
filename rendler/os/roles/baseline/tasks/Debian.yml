@@ -1,0 +1,14 @@
+---
+
+- name: Ensure system package db is up to date # noqa: package-latest
+  ansible.builtin.package:
+    state: latest
+    update_cache: true
+  become: true
+
+- name: Ensure default apps are installed
+  ansible.builtin.package:
+    name: "{{ item.name }}"
+    state: "{{ item.state }}"
+  become: true
+  with_items: "{{ baseline_os_apps }}"

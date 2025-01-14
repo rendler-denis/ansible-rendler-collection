@@ -1,0 +1,44 @@
+---
+- name: Create swapfile
+  ansible.builtin.command:
+    cmd: "dd if=/dev/zero of={{ swap.path }} bs={{ swap.size }}M count={{ swap.count }}"
+    creates: "{{ swap.path }}"
+  register: write_swapfile
+
+- name: Set swapfile permissions
+  ansible.builtin.file:
+    path: "{{ swap.path }}"
+    mode: "0600"
+
+- name: Build swapfile # noqa: no-handler no-changed-when
+  ansible.builtin.command: "mkswap {{ swap.path }}"
+  register: create_swapfile
+  when: write_swapfile.changed
+
+- name: Enable swapfile # noqa: no-handler no-changed-when
+  ansible.builtin.command: "swapon {{ swap.path }}"
+  when: create_swapfile.changed
+
+- name: Add swapfile to /etc/fstab
+  ansible.builtin.lineinfile:
+    path: /etc/fstab
+    line: "{{ swap.path }}   none    swap    sw    0   0"
+    state: present
+
+- name: Configure swappiness
+  ansible.builtin.lineinfile:
+    path: /etc/sysctl.conf
+    line: "vm.swappiness = {{ swap.swappiness }}"
+    regexp: '^vm\.swappiness\[\s\]?'
+    state: present
+  notify: Run sysctl
+  when: swap.swappiness
+
+- name: Configure vm.vfs_cache_pressure
+  ansible.builtin.lineinfile:
+    path: /etc/sysctl.conf
+    line: "vm.vfs_cache_pressure = {{ swap.vfs_cache_pressure }}"
+    regexp: '^vm.vfs_cache_pressure[\s]?='
+    state: present
+  notify: Run sysctl
+  when: swap.vfs_cache_pressure

@@ -1,0 +1,5 @@
+---
+
+- name: Ensure host name is configured
+  ansible.builtin.hostname:
+    name: "{{ hostname.name }}"
