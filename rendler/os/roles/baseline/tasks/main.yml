@@ -1,4 +1,4 @@
 ---
 
 - name: Include tasks based on distribution
-  ansible.builtin.include_tasks: "./{{ ansible_os_family }}.yaml"
+  ansible.builtin.include_tasks: "./{{ ansible_os_family }}.yml"
