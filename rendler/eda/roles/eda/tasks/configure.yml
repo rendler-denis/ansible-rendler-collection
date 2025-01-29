@@ -1,0 +1,25 @@
+# Part of the `rendler.eda` collection
+# Author: Denis Rendler <connect[at]rendler.net>
+# Copyright: 2025 Denis Rendler
+# License: GPL-2.0-or-later
+---
+
+- name: Configure rulebook
+  ansible.builtin.template:
+    src: "templates/rulebook.yml.j2"
+    dest: "{{ eda_install_dir }}/rulebooks/systemd.yml"
+    owner: "{{ eda_service_user }}"
+    group: "{{ eda_service_group }}"
+    mode: '0644'
+  tags: [install, configure]
+  when: eda_manage_rulebook
+
+- name: Configure inventory
+  ansible.builtin.template:
+    src: "templates/inventory.yml.j2"
+    dest: "{{ eda_install_dir }}/inventory/inventory.yml"
+    owner: "{{ eda_service_user }}"
+    group: "{{ eda_service_group }}"
+    mode: '0644'
+  tags: [install, configure]
+  when: eda_manage_inventory

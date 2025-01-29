@@ -1,0 +1,28 @@
+# Part of the `rendler.eda` collection
+# Author: Denis Rendler <connect[at]rendler.net>
+# Copyright: 2025 Denis Rendler
+# License: GPL-2.0-or-later
+---
+
+- name: Write requirements.yml
+  ansible.builtin.template:
+    src: "requirements.yml.j2"
+    dest: "{{ eda_install_dir }}/requirements.yml"
+    owner: "{{ eda_service_user }}"
+    group: "{{ eda_service_group }}"
+    mode: '0644'
+  tags: [install, configure]
+
+- name: Install Ansible collections # noqa: package-latest
+  ansible.builtin.command: >
+    {{ eda_install_dir }}/venv/bin/ansible-galaxy collection install -r {{ eda_install_dir }}/requirements.yml
+  become: true
+  become_user: "{{ eda_service_user }}"
+  args:
+    chdir: "{{ eda_install_dir }}"
+  register: galaxy_result
+  changed_when: "'Nothing to do' not in galaxy_result.stderr"
+  failed_when:
+    - galaxy_result.rc != 0
+    - "'Nothing to do' not in galaxy_result.stderr"
+  tags: [install, configure]

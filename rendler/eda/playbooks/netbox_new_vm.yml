@@ -1,0 +1,12 @@
+# Part of the `rendler.eda` collection
+# Author: Denis Rendler <connect[at]rendler.net>
+# Copyright: 2025 Denis Rendler
+# License: GPL-2.0-or-later
+---
+# This playbook is used to configure a new virtual environment
+# after being added to Netbox
+- name: Baseline configuration of new virtual environments
+  hosts: "{{ target }}"
+  become: true
+  roles:
+    - role: rendler.os.baseline

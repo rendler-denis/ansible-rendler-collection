@@ -1,0 +1,26 @@
+# Part of the `rendler.eda` collection
+# Author: Denis Rendler <connect[at]rendler.net>
+# Copyright: 2025 Denis Rendler
+# License: GPL-2.0-or-later
+---
+# Description: This rulebook listens for Netbox events on a webhook and triggers a playbook when a new VM is created.
+- name: Listen for Netbox events on a webhook
+  hosts: all
+
+  sources:
+    - ansible.eda.webhook:
+        host: 0.0.0.0
+        port: 5500
+        endpoint: /netbox-webhook
+
+  rules:
+    - name: New VM decleared in Netbox
+      condition: event.payload.event == "created" and event.payload.model == "virtualmachine"
+      action:
+        run_playbook:
+          delay: 10          # create a delay in seconds in case our VM data was not ready
+          # verbosity: 3     # for debugging
+          retries: 3         # retry the playbook 3 times
+          name: rendler.eda.netbox_new_vm
+          extra_vars:
+            target: "{{ event.payload.data.name }}"

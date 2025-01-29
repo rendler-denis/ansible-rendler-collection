@@ -1,0 +1,17 @@
+# Part of the `rendler.eda` collection
+# Author: Denis Rendler <connect[at]rendler.net>
+# Copyright: 2025 Denis Rendler
+# License: GPL-2.0-or-later
+---
+eda_java_packages:
+  - "openjdk-{{ eda_java_version }}-jdk"
+eda_python_packages:
+  - "python{{ eda_python_version }}"
+  - "python{{ eda_python_version }}-pip"
+  - "python{{ eda_python_version }}-venv"
+eda_system_packages:
+  - git
+  - curl
+  - ca-certificates
+  - gnupg
+  - sshpass

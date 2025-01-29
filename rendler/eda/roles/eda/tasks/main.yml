@@ -1,0 +1,108 @@
+# Part of the `rendler.eda` collection
+# Author: Denis Rendler <connect[at]rendler.net>
+# Copyright: 2025 Denis Rendler
+# License: GPL-2.0-or-later
+---
+
+- name: Include OS-specific variables
+  ansible.builtin.include_vars: "{{ ansible_os_family }}.yml"
+  tags: [install, configure]
+
+- name: Create service user and group
+  block:
+    - name: Create service group
+      ansible.builtin.group:
+        name: "{{ eda_service_group }}"
+        state: present
+      when: eda_create_service_user | bool
+
+    - name: Create service user
+      ansible.builtin.user:
+        name: "{{ eda_service_user }}"
+        group: "{{ eda_service_group }}"
+        system: true
+        create_home: true
+        shell: /bin/bash
+      when: eda_create_service_user | bool
+
+- name: Install system packages
+  ansible.builtin.package:
+    name: "{{ eda_system_packages }}"
+    state: present
+  become: true
+  tags: [install]
+
+- name: Install Java
+  ansible.builtin.package:
+    name: "{{ eda_java_packages }}"
+    state: present
+  become: true
+  tags: [install]
+
+- name: Install Python packages
+  ansible.builtin.package:
+    name: "{{ eda_python_packages }}"
+    state: present
+  become: true
+  tags: [install]
+
+- name: Create installation directory
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    owner: "{{ eda_service_user }}"
+    group: "{{ eda_service_group }}"
+    mode: '0755'
+  become: true
+  with_items:
+    - "{{ eda_install_dir }}"
+    - "{{ eda_install_dir }}/rulebooks"
+    - "{{ eda_install_dir }}/inventory"
+    - "{{ eda_install_dir }}/devops"
+  tags: [install]
+
+- name: Create Python virtual environment # noqa: package-latest
+  ansible.builtin.pip:
+    virtualenv: "{{ eda_install_dir }}/venv"
+    virtualenv_command: "python{{ eda_python_version }} -m venv"
+    name: "{{ eda_ansible_packages }}"
+    state: latest
+  become: true
+  become_user: "{{ eda_service_user }}"
+  tags: [install]
+
+- name: Ensure ansible directory exists
+  ansible.builtin.file:
+    path: "{{ eda_install_dir }}/.ansible"
+    state: directory
+    owner: "{{ eda_service_user }}"
+    group: "{{ eda_service_group }}"
+    mode: '0755'
+  become: true
+  tags: [install]
+
+- name: Create ansible.cfg
+  ansible.builtin.template:
+    src: ansible.cfg.j2
+    dest: "{{ eda_install_dir }}/ansible.cfg"
+    owner: "{{ eda_service_user }}"
+    group: "{{ eda_service_group }}"
+    mode: '0644'
+  become: true
+  tags: [install]
+
+- name: Configure collections
+  ansible.builtin.include_tasks:
+    file: collections.yml
+  tags: [install, configure]
+
+- name: Configure EDA
+  ansible.builtin.include_tasks:
+    file: configure.yml
+  tags: [install, configure]
+
+- name: Configure systemd
+  ansible.builtin.include_tasks:
+    file: systemd.yml
+  when: eda_configure_systemd | bool
+  tags: [install, configure]

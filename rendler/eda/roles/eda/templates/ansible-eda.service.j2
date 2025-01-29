@@ -1,0 +1,18 @@
+[Unit]
+Description=Ansible EDA Service
+After=network.target
+
+[Service]
+Type=simple
+User={{ eda_service_user }}
+Group={{ eda_service_group }}
+Environment=PYTHONUNBUFFERED=1
+Environment=PATH={{ eda_install_dir }}/venv/bin:/usr/local/bin:/usr/bin:/bin
+Environment=VIRTUAL_ENV={{ eda_install_dir }}/venv
+Environment=ANSIBLE_HOME={{ eda_install_dir }}/.ansible
+WorkingDirectory={{ eda_install_dir }}
+ExecStart={{ eda_install_dir }}/venv/bin/ansible-rulebook -r {{ eda_systemd_rulebook }} -i {{ eda_systemd_inventory }} --hot-reload {{ eda_systemd_extra_params | default('') }}
+Restart=always
+
+[Install]
+WantedBy=multi-user.target

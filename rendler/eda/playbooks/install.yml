@@ -1,0 +1,13 @@
+# Part of the `rendler.eda` collection
+# Author: Denis Rendler <connect[at]rendler.net>
+# Copyright: 2025 Denis Rendler
+# License: GPL-2.0-or-later
+---
+# Install EDA tools
+
+- name: Install EDA
+  hosts: "{{ target | default('all') }}"
+  become: true
+
+  roles:
+    - role: rendler.eda.eda

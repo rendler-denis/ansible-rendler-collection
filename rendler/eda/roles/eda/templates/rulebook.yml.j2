@@ -1,0 +1,8 @@
+---
+
+- name: Listen for events
+  hosts: {{ eda_rulebook_hosts | default('all') }}
+  sources:
+{{ eda_rulebook_sources | to_nice_yaml(indent=2) | indent(4, first=true) }}
+  rules:
+{{ eda_rulebook_rules | to_nice_yaml(indent=2) | indent(4, first=true) }}

@@ -1,0 +1,46 @@
+# Part of the `rendler.eda` collection
+# Author: Denis Rendler <connect[at]rendler.net>
+# Copyright: 2025 Denis Rendler
+# License: GPL-2.0-or-later
+---
+eda_java_version: "21"
+eda_python_version: "3.11"
+eda_ansible_eda_version: "latest"
+eda_install_dir: "/opt/ansible-eda"
+eda_create_service_user: true
+eda_service_user: "ansible"
+eda_service_group: "ansible"
+eda_configure_systemd: true
+
+eda_manage_rulebook: true
+eda_rulebook_hosts: "all"
+eda_rulebook_sources:
+  - ansible.eda.webhook:
+      host: 0.0.0.0
+      port: 5500
+      endpoint: /
+
+eda_rulebook_rules:
+  - name: Debug event
+    condition: true
+    action:
+      debug:
+        var: event
+
+eda_manage_inventory: true
+eda_inventory_hosts:
+  hosts: []
+
+eda_ansible_collections:
+  - ansible.eda
+  - community.general
+  - ansible.utils
+  - ansible.posix
+
+# Extra parameters for systemd service, ie:
+# eda_systemd_extra_params: "--print-events"
+# eda_systemd_extra_params: "--vars vars.yml"
+eda_systemd_extra_params: ""
+
+eda_systemd_rulebook: "{{ eda_install_dir }}/rulebooks/systemd.yml"
+eda_systemd_inventory: "{{ eda_install_dir }}/inventory/inventory.yml"

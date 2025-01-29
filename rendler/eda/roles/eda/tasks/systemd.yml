@@ -1,0 +1,21 @@
+# Part of the `rendler.eda` collection
+# Author: Denis Rendler <connect[at]rendler.net>
+# Copyright: 2025 Denis Rendler
+# License: GPL-2.0-or-later
+---
+- name: Create systemd service file
+  ansible.builtin.template:
+    src: ansible-eda.service.j2
+    dest: /etc/systemd/system/ansible-eda.service
+    mode: '0644'
+  become: true
+  notify: Reload systemd
+  tags: [install, configure]
+
+- name: Start and enable systemd service
+  ansible.builtin.systemd:
+    name: ansible-eda
+    state: started
+    enabled: true
+  become: true
+  tags: [install, configure]

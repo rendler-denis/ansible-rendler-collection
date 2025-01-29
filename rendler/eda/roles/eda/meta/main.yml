@@ -1,0 +1,21 @@
+---
+galaxy_info:
+  author: Rendler Denis
+  description: Installs Ansible EDA and dependencies
+  min_ansible_version: "2.12"
+  license: GPL-2.0-or-later
+  platforms:
+    - name: EL  # Enterprise Linux (RedHat/CentOS)
+      versions:
+        - "8"
+        - "9"
+    - name: Debian
+      versions:
+        - bullseye
+        - bookworm
+    - name: Ubuntu
+      versions:
+        - focal
+        - jammy
+
+dependencies: []
