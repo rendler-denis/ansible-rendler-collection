@@ -1,7 +1,7 @@
 ---
 
 - name: Run the uninstall/remove sequence for roles
-  hosts: all
+  hosts: "{{ target | default('all') }}"
 
   tasks:
     - name: Load the roles to run

@@ -1,6 +1,6 @@
 ---
 - name: Ensure OS baseline is deployed
-  hosts: all
+  hosts: "{{ target | default('all') }}"
   become: true
   roles:
     - rendler.os.update
