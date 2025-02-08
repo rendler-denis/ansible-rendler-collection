@@ -5,8 +5,33 @@
 ---
 # This playbook is used to configure a new virtual environment
 # after being added to Netbox
-- name: Baseline configuration of new virtual environments
+- name: Baseline configuration of new virtual environments # noqa: syntax-check[specific]
   hosts: "{{ target }}"
   become: true
+  gather_facts: true
+
+  pre_tasks:
+    - name: Send Slack notification
+      community.general.slack:
+        token: "{{ slack_token | default('') }}"
+        msg: "New VM '{{ inventory_hostname }}' has been added. Starting configuration..."
+        channel: "{{ slack_channel | default('general') }}"
+        username: 'Ansible on {{ inventory_hostname }}'
+        color: '#00aacc'
+        attachments:
+          - title: "Roles to be applied:"
+            text: '{{ ansible_roles | default([]) | join(", ") }}'
+      when: slack_notification | default(false)
+
   roles:
     - role: rendler.os.baseline
+
+  post_tasks:
+    - name: Send Slack notification
+      community.general.slack:
+        token: "{{ slack_token | default('') }}"
+        msg: "New VM '{{ inventory_hostname }}' has been configured."
+        channel: "{{ slack_channel | default('general') }}"
+        username: 'Ansible on {{ inventory_hostname }}'
+        color: '#00aacc'
+      when: slack_notification | default(false)
