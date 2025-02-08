@@ -43,4 +43,4 @@ eda_ansible_collections:
 eda_systemd_extra_params: ""
 
 eda_systemd_rulebook: "{{ eda_install_dir }}/rulebooks/systemd.yml"
-eda_systemd_inventory: "{{ eda_install_dir }}/inventory/inventory.yml"
+eda_systemd_inventory: "{{ eda_install_dir }}/inventory/"
